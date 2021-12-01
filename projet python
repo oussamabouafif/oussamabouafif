@@ -1,0 +1,61 @@
+from tkinter import *
+from PIL import ImageTk,Image
+import pygame
+collision=Tk()
+collision.title("car collision")
+pygame.mixer.init()
+#creating canvas
+coll =Canvas(collision,width=1050, height=1100,bg="red")
+coll.pack()
+#background image
+streetimage=PhotoImage(file="street.gif")
+streetbg=coll.create_image(490,490,image=streetimage)
+#placing image1 on the background
+car1image=PhotoImage(file="car1.png")
+car1_img= car1image
+car1=coll.create_image(100,750,image=car1image)
+#placing image2 on the background
+car2image=PhotoImage(file="car2.png")
+car2_img= car2image
+car2=coll.create_image(950,750,image=car2image)
+#moving the car to the right
+def moveright(event):
+    coll.move(car1,10,0)
+    car1edgereached()
+    collisiondetection()
+#moving the car to the left
+def moveleft(event):
+    coll.move(car1, -10, 0)
+    car1edgereached()
+    collisiondetection()
+#moving the car
+coll.bind_all("<Right>",moveright)
+coll.bind_all("<d>",moveright)
+coll.bind_all("<a>",moveleft)
+coll.bind_all("<Left>",moveleft)
+#edge reached
+def car1edgereached():
+    car1boundary=coll.bbox(car1)
+    car1left=car1boundary[0]
+    car1right=car1boundary[2]
+    if car1left <0:
+        coll.move(car1,10,0)
+    elif car1right >860:
+        coll.move(car1,-10,0)
+#detect collision
+def collisiondetection():
+    global img
+    cb1=coll.bbox(car1)
+    cb2=coll.bbox(car2)
+    if cb2[0]<cb1[2]<cb2[2] and cb2[1]<cb1[1]<cb2[3]:
+        global img
+        img = ImageTk.PhotoImage(Image.open("frein.gif"))
+        coll.create_image(500, 500, image=img)
+        coll_t=coll.create_text(200,200,text="frein automatique",tags='frein')
+        pygame.mixer.music.load("VEHSkid_Crissement de pneus 1 (ID 2368)_LS.mp3")
+        pygame.mixer.music.play(loops=0)
+    else:
+        img = ImageTk.PhotoImage(Image.open("frein.gif"))
+        coll.delete(img)
+        coll.delete('frein')
+collision.mainloop()
